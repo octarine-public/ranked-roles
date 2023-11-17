@@ -10,6 +10,7 @@ import {
 	Rectangle,
 	RendererSDK,
 	Team,
+	TextFlags,
 	Vector2
 } from "github.com/octarine-public/wrapper/index"
 
@@ -79,7 +80,7 @@ export class GUIHelper {
 		}
 
 		if (laneSelections.length === 1) {
-			this.drawOnlyOneRole(rolePosition, roleImageSize, laneSelections[0])
+			this.drawTextForRole(rolePosition, laneSelections[0])
 			return
 		}
 
@@ -110,62 +111,59 @@ export class GUIHelper {
 		return Menu.Localization.Localize(this.roleLocalizationNames[role] ?? "No role")
 	}
 
-	private drawOnlyOneRole(
-		rolePosition: Rectangle,
-		roleImageSize: Vector2,
-		lane: LaneSelection
-	) {
-		const roleName = this.getRoleName(lane)
-		const iconTier = ImageData.GetRank(lane)
-
-		const scaletextSize = !this.isPreGame ? 11 : 8
-		const textSize = GUIInfo.ScaleHeight(scaletextSize)
-		const getTextSize = this.getTextSize(roleName, textSize)
-
-		const center = rolePosition.x + rolePosition.Size.x / 2
-		const position = new Vector2(center, rolePosition.y)
-
-		const textPosition = position
-			.Clone()
-			.SubtractScalarX(getTextSize.x / 2)
-			.RoundForThis()
-
+	private drawTextForRole(position: Rectangle, lane: LaneSelection) {
 		if (!this.isPreGame) {
-			const iconTierPosition = textPosition.SubtractScalarX(roleImageSize.x)
-			RendererSDK.Image(iconTier, iconTierPosition, -1, roleImageSize, this.color)
+			this.drawInHeroSelection(position, lane)
+			return
 		}
 
-		if (roleName.length < 10 || !this.isPreGame) {
-			if (this.isSelection) {
-				textPosition.AddScalarX(roleImageSize.x)
-			}
-			this.drawText(roleName, textPosition, textSize)
+		const division = 1.7
+		const roleName = this.getRoleName(lane)
+		if (roleName.length < 10) {
+			this.drawText(roleName, position, division, TextFlags.Top)
 			return
 		}
 
 		const names = roleName.split(" ")
-		const gap = GUIInfo.ScaleHeight(13)
+		const gapBetweenName = GUIInfo.ScaleHeight(13)
 
 		for (const newName of names) {
-			const newTextSize = this.getTextSize(newName, textSize)
-			const newPosition = position.Clone().SubtractScalarX(newTextSize.x / 2)
-			this.drawText(newName, newPosition, textSize)
-			position.AddScalarY(gap)
+			this.drawText(newName, position, division, TextFlags.Top)
+			position.AddY(gapBetweenName)
 		}
 	}
 
-	private getTextSize(name: string, size: number) {
-		return RendererSDK.GetTextSize(name, RendererSDK.DefaultFontName, size, 600)
+	private drawInHeroSelection(rolePosition: Rectangle, lane: LaneSelection) {
+		const size = GUIInfo.ScaleWidth(16)
+		const roleName = this.getRoleName(lane)
+		const iconTier = ImageData.GetRank(lane)
+		const newPosition = rolePosition.Clone()
+		newPosition.pos1.AddScalarX(size / 2)
+		const textPosition = this.drawText(roleName, newPosition)
+		const imageSize = new Vector2(size, size)
+		const iconPosition = textPosition.pos1
+			.SubtractScalarY(2)
+			.SubtractScalarX(imageSize.x)
+		RendererSDK.Image(iconTier, iconPosition, -1, imageSize, this.color)
 	}
 
-	private drawText(name: string, position: Vector2, size: number) {
-		RendererSDK.Text(
-			name,
+	private drawText(
+		text: string,
+		position: Rectangle,
+		divider = 1.4,
+		flags = TextFlags.Center
+	) {
+		return RendererSDK.TextByFlags(
+			text,
 			position,
 			this.color,
+			divider,
+			flags,
+			600,
 			RendererSDK.DefaultFontName,
-			size,
-			600
+			false,
+			false,
+			false
 		)
 	}
 }
