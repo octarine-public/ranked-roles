@@ -6,7 +6,7 @@ import {
 	ImageData,
 	LaneSelection,
 	Menu,
-	Player,
+	PlayerCustomData,
 	Rectangle,
 	RendererSDK,
 	Team,
@@ -58,7 +58,7 @@ export class GUIHelper {
 		)
 	}
 
-	public Draw(player: Player) {
+	public Draw(player: PlayerCustomData) {
 		if (this.isShowCase) {
 			return
 		}

@@ -2,10 +2,9 @@ import "./translations"
 
 import {
 	DOTAGameUIState,
-	Entity,
 	EventsSDK,
 	GameState,
-	Player,
+	PlayerCustomData,
 	Team
 } from "github.com/octarine-public/wrapper/index"
 
@@ -17,7 +16,7 @@ const bootstrap = new (class {
 
 	private readonly hpThreshold = 50
 	private readonly menu = new MenuManager()
-	private readonly players = new Set<Player>()
+	private readonly playersData = new Set<PlayerCustomData>()
 
 	public Draw() {
 		if (GameState.UIState !== DOTAGameUIState.DOTA_GAME_UI_DOTA_INGAME) {
@@ -26,7 +25,7 @@ const bootstrap = new (class {
 		if (!this.menu.State.value || !this.GUI.IsReady || this.GUI.IsGameInProgress) {
 			return
 		}
-		for (const player of this.players) {
+		for (const player of this.playersData) {
 			if (!player.IsEnemy() || !player.LaneSelections.length) {
 				continue
 			}
@@ -40,34 +39,19 @@ const bootstrap = new (class {
 		}
 	}
 
-	public EntityCreated(entity: Entity) {
-		if (entity instanceof Player && !entity.IsSpectator) {
-			this.players.add(entity)
-		}
-	}
-
-	public EntityDestroyed(entity: Entity) {
-		if (entity instanceof Player) {
-			this.players.delete(entity)
-		}
-	}
-
-	public EntityTeamChanged(entity: Entity) {
-		if (!(entity instanceof Player) || entity.IsSpectator) {
+	public PlayerCustomDataUpdated(entity: PlayerCustomData) {
+		if (!entity.IsValid || entity.IsSpectator) {
+			this.playersData.delete(entity)
 			return
 		}
-		if (entity.IsValid) {
-			this.players.add(entity)
-			return
+		if (!this.playersData.has(entity)) {
+			this.playersData.add(entity)
 		}
-		this.players.delete(entity)
 	}
 })()
 
 EventsSDK.on("Draw", () => bootstrap.Draw())
 
-EventsSDK.on("EntityCreated", entity => bootstrap.EntityCreated(entity))
-
-EventsSDK.on("EntityDestroyed", entity => bootstrap.EntityDestroyed(entity))
-
-EventsSDK.on("EntityTeamChanged", entity => bootstrap.EntityTeamChanged(entity))
+EventsSDK.on("PlayerCustomDataUpdated", entity =>
+	bootstrap.PlayerCustomDataUpdated(entity)
+)
