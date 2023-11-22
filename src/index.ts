@@ -1,6 +1,7 @@
 import "./translations"
 
 import {
+	ArrayExtensions,
 	DOTAGameUIState,
 	EventsSDK,
 	GameState,
@@ -12,11 +13,10 @@ import { GUIHelper } from "./gui"
 import { MenuManager } from "./menu"
 
 const bootstrap = new (class {
-	protected readonly GUI = new GUIHelper()
-
 	private readonly hpThreshold = 50
+	private readonly GUI = new GUIHelper()
 	private readonly menu = new MenuManager()
-	private readonly playersData = new Set<PlayerCustomData>()
+	private readonly playersData: PlayerCustomData[] = []
 
 	public Draw() {
 		if (GameState.UIState !== DOTAGameUIState.DOTA_GAME_UI_DOTA_INGAME) {
@@ -25,8 +25,9 @@ const bootstrap = new (class {
 		if (!this.menu.State.value || !this.GUI.IsReady || this.GUI.IsGameInProgress) {
 			return
 		}
-		for (const player of this.playersData) {
-			if (!player.IsEnemy() || !player.LaneSelections.length) {
+		for (let index = this.playersData.length - 1; index > -1; index--) {
+			const player = this.playersData[index]
+			if (!player.LaneSelections.length) {
 				continue
 			}
 			// hide roles with low % health (if used top panel and any scripts enabled)
@@ -40,12 +41,15 @@ const bootstrap = new (class {
 	}
 
 	public PlayerCustomDataUpdated(entity: PlayerCustomData) {
-		if (!entity.IsValid || entity.IsSpectator) {
-			this.playersData.delete(entity)
+		if (!entity.IsValid || entity.IsSpectator || !entity.IsEnemy()) {
+			ArrayExtensions.arrayRemove(this.playersData, entity)
 			return
 		}
-		if (!this.playersData.has(entity)) {
-			this.playersData.add(entity)
+		if (this.GUI.IsGameInProgress) {
+			return
+		}
+		if (this.playersData.every(x => x.PlayerID !== entity.PlayerID)) {
+			this.playersData.push(entity)
 		}
 	}
 })()
