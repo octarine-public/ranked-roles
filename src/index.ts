@@ -1,7 +1,6 @@
 import "./translations"
 
 import {
-	ArrayExtensions,
 	DOTAGameUIState,
 	EventsSDK,
 	GameState,
@@ -42,7 +41,7 @@ const bootstrap = new (class {
 
 	public PlayerCustomDataUpdated(entity: PlayerCustomData) {
 		if (!entity.IsValid || entity.IsSpectator || !entity.IsEnemy()) {
-			ArrayExtensions.arrayRemove(this.playersData, entity)
+			this.playersData.remove(entity)
 			return
 		}
 		if (this.GUI.IsGameInProgress) {
