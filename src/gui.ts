@@ -88,7 +88,7 @@ export class GUIHelper {
 		const xPosition = rolePosition.x + rolePosition.Size.x / 2
 		for (let index = laneSelections.length - 1; index > -1; index--) {
 			const lane = laneSelections[index]
-			const iconTier = ImageData.GetRank(lane)
+			const iconTier = ImageData.GetRankTexture(lane)
 			const position = new Vector2(xPosition, rolePosition.y + 1)
 				.AddScalarX(index * roleImageSize.x)
 				.SubtractScalarX((roleImageSize.x * laneSelections.length) / 2)
@@ -136,7 +136,7 @@ export class GUIHelper {
 	private drawInHeroSelection(rolePosition: Rectangle, lane: LaneSelection) {
 		const size = GUIInfo.ScaleWidth(16)
 		const roleName = this.getRoleName(lane)
-		const iconTier = ImageData.GetRank(lane)
+		const iconTier = ImageData.GetRankTexture(lane)
 		const newPosition = rolePosition.Clone()
 		newPosition.pos1.AddScalarX(size / 2)
 		const textPosition = this.drawText(roleName, newPosition)

@@ -3,7 +3,7 @@ import { ImageData, LaneSelection, Menu } from "github.com/octarine-public/wrapp
 export class MenuManager {
 	public readonly State: Menu.Toggle
 
-	private readonly imageNode = ImageData.GetRank(LaneSelection.MID_LANE)
+	private readonly imageNode = ImageData.GetRankTexture(LaneSelection.MID_LANE)
 
 	constructor() {
 		const main = Menu.AddEntry("Visual")
