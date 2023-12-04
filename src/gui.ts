@@ -52,9 +52,9 @@ export class GUIHelper {
 
 	private get isSelection() {
 		return (
-			this.gameState === DOTAGameState.DOTA_GAMERULES_STATE_HERO_SELECTION ||
-			this.gameState === DOTAGameState.DOTA_GAMERULES_STATE_PLAYER_DRAFT ||
-			this.gameState === DOTAGameState.DOTA_GAMERULES_STATE_STRATEGY_TIME
+			(this.gameState > DOTAGameState.DOTA_GAMERULES_STATE_INIT &&
+				this.gameState <= DOTAGameState.DOTA_GAMERULES_STATE_STRATEGY_TIME) ||
+			this.gameState === DOTAGameState.DOTA_GAMERULES_STATE_PLAYER_DRAFT
 		)
 	}
 
