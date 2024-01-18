@@ -1,7 +1,9 @@
 import {
 	Color,
 	DOTAGameState,
+	DOTAGameUIState,
 	GameRules,
+	GameState,
 	GUIInfo,
 	ImageData,
 	LaneSelection,
@@ -32,6 +34,14 @@ export class GUIHelper {
 
 	public get IsGameInProgress() {
 		return this.gameState === DOTAGameState.DOTA_GAMERULES_STATE_GAME_IN_PROGRESS
+	}
+
+	public get IsPostGame() {
+		return this.gameState === DOTAGameState.DOTA_GAMERULES_STATE_POST_GAME
+	}
+
+	public get IsUIGame() {
+		return GameState.UIState === DOTAGameUIState.DOTA_GAME_UI_DOTA_INGAME
 	}
 
 	private get color() {
