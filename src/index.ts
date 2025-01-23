@@ -10,10 +10,14 @@ import {
 import { GUIHelper } from "./gui"
 import { MenuManager } from "./menu"
 
-const bootstrap = new (class CRankedRoles {
+new (class CRankedRoles {
 	private readonly hpThreshold = 50
 	private readonly GUI = new GUIHelper()
 	private readonly menu = new MenuManager()
+
+	constructor() {
+		EventsSDK.on("Draw", this.Draw.bind(this))
+	}
 
 	protected get State() {
 		return this.menu.State.value
@@ -45,5 +49,3 @@ const bootstrap = new (class CRankedRoles {
 		}
 	}
 })()
-
-EventsSDK.on("Draw", () => bootstrap.Draw())
